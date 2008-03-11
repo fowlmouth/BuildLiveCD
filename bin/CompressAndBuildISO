@@ -233,7 +233,7 @@ then
       if [ ! -e "$out" ] || [ $diffs -gt 0 ] || ld_so_cache_changed
       then
          echo "Creating squashfs compressed file $bn..."
-         nice -20 mksquashfs $dirs "$out" -noappend -keep-as-directory $blacklist
+         nice -20 mksquashfs $dirs "$out" -noappend -no-sparse -keep-as-directory $blacklist
       else
          echo "Mksquashfs not needed for $bn."
       fi
