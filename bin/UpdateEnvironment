@@ -3,17 +3,17 @@
 if [ "$1" == "--help" ]
 then
    echo "Usage:"
-   echo "   UpdateEnvironment [ <cvs-account> [ <local-account> ] ]"
+   echo "   UpdateEnvironment [ <svn-account> [ <local-account> ] ]"
    echo
    echo "Run this on an empty directory to create the"
    echo "GoboLinux LiveCD mastering environment."
    echo "It will fetch all needed files off the network"
    echo "and create the proper directory layout."
-   echo "If you have CVS write access, pass your savannah"
-   echo "username as a parameter and, optionally,"
-   echo "the username in the current machine"
-   echo "which holds your savannah SSH credentials,"
-   echo "if it is not the same as your savannah username."
+   echo "If you have SVN write access, pass your svn.gobolinux.org"
+   echo "username as a parameter." # and, optionally,"
+#   echo "the username in the current machine"
+#   echo "which holds your savannah SSH credentials,"
+#   echo "if it is not the same as your savannah username."
    echo
    exit 0
 fi
@@ -55,7 +55,7 @@ function check_and_dl() {
 
 (
    cd $datadir
-   [ -d CVS ] && cvs up -dP
+   [ -d .svn ] && svn up # svn doesn't need "-dP" args to create new dirs and prune empty
 )
 
 arch=i686
@@ -68,54 +68,55 @@ done
 
 
 #############################################################################
-# LocalCVS
+# LocalSVN
 #############################################################################
-echo "=> Updating local CVS copy..."
+echo "=> Updating local SVN copy..."
 
 if [ "$1" ]
 then
-   cvsuser="$1"
+   svnuser="$1"
    if [ "$2" ]
    then localuser="$2"
    else localuser="$1"
    fi
 else
-   cvsuser=anonymous
+   svnuser=anonymous
 fi
 
-mkdir -p $root/LocalCVS/
-cd $root/LocalCVS/
+mkdir -p $root/LocalSVN/tools
+cd $root/LocalSVN/
 
-if [ -e $datadir/Packages-List-GoboLinuxTools-CVS ]
-then tools="`cat $datadir/Packages-List-GoboLinuxTools-CVS` InitRDScripts"
+if [ -e $datadir/Packages-List-GoboLinuxTools-SVN ]
+then tools="`cat $datadir/Packages-List-GoboLinuxTools-SVN` InitRDScripts"
 else tools="InitRDScripts"
 fi
 
-for cvsrepo in files `for x in $tools; do echo tools/$x; done`
+for svnrepo in $tools
 do
-   if [ "$cvsuser" = "anonymous" ]
+   if [ -e "tools/$svnrepo" ]
    then
-      if [ -e "$cvsrepo" ]
-      then
-         echo "Updating $cvsrepo..."
-         cd $cvsrepo
-         cvs -q up -dP
-         cd - &> /dev/null
-      else
-         echo "Getting $cvsrepo..."
-         cvs -d :pserver:anonymous@cvs.sv.gnu.org:/sources/goboscripts -q co $cvsrepo
-      fi
+      echo "Updating $svnrepo..."
+      cd tools/$svnrepo
+      svn -q up #-dP
+      cd - &> /dev/null
    else
-      if [ -e "$cvsrepo" ]
-      then
-         echo "Updating $cvsrepo..."
-         sudo -H -u $localuser bash -c "cd '$cvsrepo' && cvs -q up -dP"
-      else
-         echo "Getting $cvsrepo..."
-         export CVS_RSH=ssh
-         chown $localuser .
-         sudo -H -u $localuser cvs -d :ext:$cvsuser@cvs.sv.gnu.org:/sources/goboscripts -q co $cvsrepo
-      fi
+      echo "Getting $svnrepo..."
+      svn -q co http://svn.gobolinux.org/tools/trunk/$svnrepo tools/$svnrepo
+   fi
+done
+
+files="Descriptions Wallpapers"
+for svnrepo in $files
+do
+   if [ -e "files/$svnrepo" ]
+   then
+      echo "Updating $svnrepo..."
+      cd files/$svnrepo
+      svn -q up #-dP
+      cd - &> /dev/null
+   else
+      echo "Getting $svnrepo..."
+      svn -q co http://svn.gobolinux.org/files/trunk/$svnrepo files/$svnrepo
    fi
 done
 
@@ -125,6 +126,7 @@ rm -rf files/Documentation
 # Packages
 #############################################################################
 echo "=> Fetching remote packages..."
-rsync --times --perms --delete --verbose --progress -r -L gobo.calica.com::gobolinux-packages/livecd/ $root/Packages/
+#rsync --times --perms --delete --verbose --progress -r -L gobo.calica.com::gobolinux-packages/livecd/ $root/Packages/
+#rsync --times --perms --verbose --progress -r -L gobo.calica.com::gobolinux-packages/livecd/ $root/Packages/
 
 echo "=> Done."

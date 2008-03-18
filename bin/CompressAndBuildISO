@@ -60,7 +60,7 @@ fi
 root=$PWD
 arch=i686
 today=`date +%Y%m%d`
-localcvs=$root/LocalCVS
+localsvn=$root/LocalSVN
 packages=$root/Packages
 datadir="/Programs/BuildLiveCD/Current/Data" 
    
@@ -71,15 +71,15 @@ if [ "$start_at" -le "$STAGE_ROLAYER" ] && [ "$stop_at" -ge "$STAGE_ROLAYER" ]
 then
    echo "=> ROLayer stage started"
 
-   if ! [ -e LocalCVS -a -e Packages -a -e Archives ]
+   if ! [ -e LocalSVN -a -e Packages -a -e Archives ]
    then
       echo 'Basic directories could not be found.'
       echo 'Please check if you are running the script inside a directory populated by UpdateEnviromnent'
       exit 1
    fi
 
-   if [ -e $datadir/Packages-List-GoboLinuxTools-CVS ]
-   then tools=`cat $datadir/Packages-List-GoboLinuxTools-CVS`
+   if [ -e $datadir/Packages-List-GoboLinuxTools-SVN ]
+   then tools=`cat $datadir/Packages-List-GoboLinuxTools-SVN`
    else tools=""
    fi
 
@@ -89,21 +89,21 @@ then
    do
       tarball=$package--$today--$arch.tar.bz2
 
-      if [ ! -e "$tarball" -o "`find "$localcvs/tools/$package/" -newer "$tarball" 2> /dev/null`" ] 
+      if [ ! -e "$tarball" -o "`find "$localsvn/tools/$package/" -newer "$tarball" 2> /dev/null`" ] 
       then
-         echo "Packing $package CVS snapshot..."
+         echo "Packing $package SVN snapshot..."
          rm -rf $package                    # only required if there are leftovers from a previous execution
          mkdir -p $package
-         cp -a $localcvs/tools/$package $package/$today
+         cp -a $localsvn/tools/$package $package/$today
          # we need to build here in order to create the files which are going to be linked inside BuildRoot
          [ -e $package/$today/Makefile ] && echo Building $package/$today && make -C $package/$today > /dev/null 
-         find $package/$today/ -type d -name CVS | xargs rm -rf
+         find $package/$today/ -type d -name SVN | xargs rm -rf
          rm -f $package--*--$arch.tar.bz2   # cleaning up old versions too
          tar cjpf $tarball $package/$today  # create the package
          rm -rf $package
          toolswhichneedmake="$toolswhichneedmake $package"
       else
-         echo "Not repacking $package CVS snapshot..."
+         echo "Not repacking $package SVN snapshot..."
       fi
 
    done
@@ -126,15 +126,15 @@ then
       fi
    done
 
-   echo "Coping /Files from LocalCVS..."
+   echo "Coping /Files from LocalSVN..."
    # Add few items to rolayer
    for directory in Descriptions Wallpapers
    do
-      if ! diff --recursive --exclude=CVS "LocalCVS/files/$directory" "Output/ROLayer/Files/$directory" &> /dev/null
+      if ! diff --recursive --exclude=.svn "LocalSVN/files/$directory" "Output/ROLayer/Files/$directory" &> /dev/null
       then
          echo "Updating Files/$directory"
          rm -rf "Output/ROLayer/Files/$directory"
-         cp -a "LocalCVS/files/$directory" "Output/ROLayer/Files"
+         cp -a "LocalSVN/files/$directory" "Output/ROLayer/Files"
       else
          echo "Keeping Files/$directory"
       fi
@@ -155,9 +155,9 @@ then
       echo "$ffontsmd5" > Output/Checksums/Files-Fonts
    fi
 
-   # Clean CVS files from ROLayer
-   echo "Removing CVS files..."
-   find Output/ROLayer/Files -type d -name CVS | xargs rm -rf
+   # Clean SVN files from ROLayer
+   echo "Removing SVN files..."
+   find Output/ROLayer/Files -type d -name .svn | xargs rm -rf
 
    echo "=> ROLayer stage done"
 fi
@@ -301,15 +301,15 @@ then
    cd Archives/
    for package in InitRDScripts
    do
-      echo "Packing $package CVS snapshot..."
+      echo "Packing $package SVN snapshot..."
       tarball=$package--$today--$arch.tar.bz2
       rm -rf $package
       rm $package--*
       mkdir -p $package/$today
-      cp -a $localcvs/tools/$package/* $package/$today
+      cp -a $localsvn/tools/$package/* $package/$today
       cd $package/$today
       [ -e Makefile ] && make > /dev/null
-      find -type d -name CVS | xargs rm -rf 
+      find -type d -name .svn | xargs rm -rf 
       cd ..
       ln -nfs $today Current
       cd ..
