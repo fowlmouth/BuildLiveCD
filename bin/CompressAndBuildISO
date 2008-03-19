@@ -263,12 +263,23 @@ then
       fi
       # Skip comments
       applist=`cat $i | cut -f1 -d' ' | grep -v "^#" | sort -u | while read i; do [ ! -z "$i" ] && echo $i; done`
-      blackapplist=`cd Programs; for dir in *; do cat $i | cut -f1 -d' ' | grep -v "^#" | grep -q "^$dir$" || echo "-e $dir"; done`
+
       if [ -z "$applist" ]
       then continue
       fi
       searchdirs=`for i in $applist; do echo Programs/$i; done | tr -s '\n' ' '`
-      time mksquashfs_on_demand $squashfile Programs "$searchdirs" "$blackapplist"
+
+      # Conditionally regen squashfs.  Need to do return code hack because time returns 0
+      rtn_file=`mktemp /tmp/BuildLiveCD_return.XXXXXXX`
+      time (mksquashfs_on_demand $squashfile "$searchdirs" "" ""; echo $? >$rtn_file)
+      rtn=`cat $rtn_file`
+
+      # If the squashfs was generated, it contains Packagename dirs rather than Programs/Foo
+      # If we append to an existing squashfs -root-becomes allows the root to be reassigned
+      # in this case, Programs
+      empty_dir=`mktemp -d /tmp/BuildLiveCD-emptydir.XXXXX`
+      [ "$rtn" == "1" ] && mksquashfs $empty_dir $squashfile -root-becomes Programs
+      rmdir $empty_dir
    done
 
    contents=`ls | grep -v "Files\|Programs\|Users" | tr -s '\n' ' '`
