@@ -213,12 +213,12 @@ then
       if [ -e "$out" ]
       then
          echo "Checking if $bn needs updating..."
-         pushd ../ROLayer
+         quiet pushd ../ROLayer
          find $searchdirs -newer "$out" 2> /dev/null > /tmp/newer.txt
-         popd
-         pushd ../RWLayer
+         quiet popd
+         quiet pushd ../RWLayer
          find $searchdirs -newer "$out" 2> /dev/null >> /tmp/newer.txt
-         popd
+         quiet popd
          diffs=`cat /tmp/newer.txt | grep -v "^Programs/Glibc$\|^Programs/Glibc/Settings$\|^Programs/Glibc/Settings/ld.so.cache$" | wc -l`
          ld_so_cache_changed
          
@@ -234,6 +234,7 @@ then
       if [ ! -e "$out" ] || [ $diffs -gt 0 ] || ld_so_cache_changed
       then
          echo "Creating squashfs compressed file $bn..."
+         quiet rm $out
          nice -20 mksquashfs $dirs "$out" -noappend -no-sparse -keep-as-directory $blacklist
          rtn=1  # Created squashfs file
       else
@@ -283,7 +284,7 @@ then
    done
 
    contents=`ls | grep -v "Files\|Programs\|Users" | tr -s '\n' ' '`
-   time mksquashfs_on_demand ../ISO/GoboLinux-rest.squashfs "$contents"
+   time mksquashfs_on_demand ../ISO/GoboLinux-rest.squashfs "$contents" "" ""
    quiet popd # Output/Environment
 
    umount Output/Environment
@@ -351,6 +352,10 @@ fi
 if [ "$start_at" -le "$STAGE_ISO" ] && [ "$stop_at" -ge "$STAGE_ISO" ]
 then
    echo "=> ISO stage started"
+   echo "Generate md5sums"
+   quiet pushd Output/ISO
+   md5sum isolinux/kernel isolinux/initrd *.squashfs >md5sums
+   quiet popd   
    iso_name="Output/GoboLinux-NoVersion.iso"
    time nice -20 mkisofs -R -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table Output/ISO  > $iso_name
    echo "=> ISO stage done"

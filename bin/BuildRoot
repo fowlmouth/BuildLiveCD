@@ -348,6 +348,8 @@ else
    echo "Keeping ${root}/System/Links/Environment/Cache"
 fi
 
+echo "Running ldconfig"
+ldconfig -r ${root}
 
 # SymlinkProgram --relative is not perfect yet, but, ideally, we should call the following command
 #echo "Checking for broken links at ${root}/System/Links/"
