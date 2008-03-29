@@ -227,10 +227,10 @@ create_dir $root/System/Kernel/Status
 create_dir $root/Users
 create_dir $root/Users/root
 create_dir $root/Files
-create_dir $root/Files/Compile
-create_dir $root/Files/Compile/Archives
-create_dir $root/Files/Compile/Sources
-create_dir $root/Files/Compile/Store
+create_dir $root/Files/Compile "0.sys" 2775
+create_dir $root/Files/Compile/Archives "0.sys" 2775
+create_dir $root/Files/Compile/Sources "0.sys" 2775
+create_dir $root/Files/Compile/Store "0.sys" 2775
 create_dir $root/Depot
 create_dir $root/Mount
 create_dir $root/Mount/.Pivot
