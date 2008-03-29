@@ -26,6 +26,8 @@ GMP
 Htop
 HwData
 ID3Lib
+Iwlwifi-3945-ucode
+Iwlwifi-4965-ucode
 Indent
 JACK
 JPEG
@@ -45,6 +47,7 @@ LibVorbis
 LibXML2
 LibXSLT
 Lsof
+LVM2
 Mdadm
 Neon           # Subversion dependency for SSL support
 OpenSSH
@@ -56,6 +59,7 @@ RP-PPPoE
 Rsync
 Ruby
 SquashFS-Tools
+SSHFS
 Subversion
 SysFSUtils
 TIFF
