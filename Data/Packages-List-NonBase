@@ -142,4 +142,5 @@ PCMCIAUtils
 Madwifi
 WPA_Supplicant
 Dmraid
-NDISWrapper
+NDISwrapper
+
