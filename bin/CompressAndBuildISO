@@ -53,7 +53,12 @@ localsvn=$root/LocalSVN
 packages=$root/Packages
 datadir="$livecdDataDir"
 usesystemindex="$livecdUseSystemIndex"
-   
+
+if [ "$usesystemindex" ]
+then filesdir=Data
+else filesdir=Files
+fi
+
 #############################################################################
 # ROLayer
 #############################################################################
@@ -119,38 +124,38 @@ then
       fi
    done
 
-   echo "Coping /Files from LocalSVN..."
+   echo "Coping $filesdir from LocalSVN..."
    # Add few items to rolayer
    for directory in Descriptions Wallpapers
    do
-      if ! diff --recursive --exclude=.svn "LocalSVN/files/$directory" "Output/ROLayer/Files/$directory" &> /dev/null
+      if ! diff --recursive --exclude=.svn "LocalSVN/files/$directory" "Output/ROLayer/$filesdir/$directory" &> /dev/null
       then
-         echo "Updating Files/$directory"
-         rm -rf "Output/ROLayer/Files/$directory"
-         cp -a "LocalSVN/files/$directory" "Output/ROLayer/Files"
+         echo "Updating /$filesdir/$directory"
+         rm -rf "Output/ROLayer/$filesdir/$directory"
+         cp -a "LocalSVN/files/$directory" "Output/ROLayer/$filesdir"
       else
-         echo "Keeping Files/$directory"
+         echo "Keeping $filesdir/$directory"
       fi
    done
 
    # /Files/Fonts
    ffontsmd5=`md5sum Archives/Files-Fonts.tar.bz2`
-   if [ -d "Output/ROLayer/Files/Fonts" ]
+   if [ -d "Output/ROLayer/$filesdir/Fonts" ]
    then
       ffontsmd5old=`cat Output/Checksums/Files-Fonts`
    fi
    if [ "$ffontsmd5" = "$ffontsmd5old" ]
    then
-      echo "Keeping /Files/Fonts..."
+      echo "Keeping /$filesdir/Fonts..."
    else
-      echo "Unpacking /Files/Fonts..."
-      tar xfj Archives/Files-Fonts.tar.bz2 --overwrite -C Output/ROLayer/Files
+      echo "Unpacking /$filesdir/Fonts..."
+      tar xfj Archives/Files-Fonts.tar.bz2 --overwrite -C Output/ROLayer/$filesdir
       echo "$ffontsmd5" > Output/Checksums/Files-Fonts
    fi
 
    # Clean SVN files from ROLayer
    echo "Removing SVN files..."
-   find Output/ROLayer/Files -type d -name .svn | xargs rm -rf
+   find Output/ROLayer/$filesdir -type d -name .svn | xargs rm -rf
 
    echo "=> ROLayer stage done"
 fi
@@ -245,7 +250,7 @@ then
    # compress the uncompressed files into squashfs files
    mkdir -p Output/ISO
    Quiet pushd Output/Environment
-   time mksquashfs_on_demand ../ISO/GoboLinux-files.squashfs Files
+   time mksquashfs_on_demand ../ISO/GoboLinux-files.squashfs $filesdir
 
    for i in $datadir/Packages-List-*; do 
       squashfile=../ISO/`basename $i`.squashfs
@@ -276,7 +281,7 @@ then
       rmdir $empty_dir
    done
 
-   contents=`ls | grep -v "Files\|Programs\|Users" | tr -s '\n' ' '`
+   contents=`ls | grep -v "$filesdir\|Programs\|Users" | tr -s '\n' ' '`
    time mksquashfs_on_demand ../ISO/GoboLinux-rest.squashfs "$contents" "" ""
    Quiet popd # Output/Environment
 
