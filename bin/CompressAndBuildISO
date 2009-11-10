@@ -51,7 +51,8 @@ arch=i686
 today=`date +%Y%m%d`
 localsvn=$root/LocalSVN
 packages=$root/Packages
-datadir="$livecdDataDir" 
+datadir="$livecdDataDir"
+usesystemindex="$livecdUseSystemIndex"
    
 #############################################################################
 # ROLayer
@@ -100,7 +101,10 @@ then
    echo
    echo "Building root..."
    cd "$root"
-   BuildRoot "Output/ROLayer" "Packages" $datadir/Packages-List-* || exit 1
+
+   unset buildrootopts
+   [ "$usesystemindex" ] && buildrootopts="--use-system-index"
+   BuildRoot --root="Output/ROLayer" --packagedir="Packages" $buildrootopts $datadir/Packages-List-* || exit 1
    
    echo
    cd "$root"
