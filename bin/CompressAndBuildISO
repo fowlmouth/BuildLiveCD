@@ -1,4 +1,5 @@
 #!/bin/bash
+
 . ScriptFunctions
 Import OptionParser
 Import GoboLinux 
@@ -333,7 +334,9 @@ then
    done
    cd $root
 
-   MakeInitRDTree || Die "Failed creating initrd environment."
+   unset makeinitrdopts 
+   [ "$usesystemindex" ] && makeinitrdopts="--use-system-index"
+   MakeInitRDTree $makeinitrdopts || Die "Failed creating initrd environment."
    echo "Copying nls modules from Output/ROLayer/System/Kernel/Modules"
    cp --remove-destination Output/ROLayer/Programs/Linux/Current/Resources/Unmanaged/System/Kernel/Modules/Current/kernel/fs/nls/nls_cp437.ko $initrd_dir/System/Kernel/Modules
    cp --remove-destination Output/ROLayer/Programs/Linux/Current/Resources/Unmanaged/System/Kernel/Modules/Current/kernel/fs/nls/nls_iso8859-1.ko $initrd_dir/System/Kernel/Modules
