@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 function write_file() {
       cat > "$1"
