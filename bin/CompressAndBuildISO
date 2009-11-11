@@ -167,9 +167,10 @@ fi
 if [ "$start_at" -le "$STAGE_SQUASHFS" ] && [ "$stop_at" -ge "$STAGE_SQUASHFS" ]
 then
    echo "=> SquashFS stage started"
-   if ! which mksquashfs &> /dev/null || ! mksquashfs -h 2>&1 | grep -q "\-no-exports"
+   squashfsmajor=`mksquashfs -version 2> /dev/null | head -n 1 | awk {'print $3'} | cut -d. -f1`
+   if [ ! "$squashfsmajor" ] || [ $squashfsmajor -lt 4 ]
    then
-      echo "You need to install SquashFS-Tools version 3.2 or above."
+      echo "You need to install SquashFS-Tools version 4.0 or above."
       exit 1
    fi
 
@@ -273,6 +274,7 @@ then
       rtn_file=`mktemp /tmp/BuildLiveCD_return.XXXXXXX`
       time (mksquashfs_on_demand $squashfile "$searchdirs" "" ""; echo $? >$rtn_file)
       rtn=`cat $rtn_file`
+      rm -f $rtn_file
 
       # If the squashfs was generated, it contains Packagename dirs rather than Programs/Foo
       # If we append to an existing squashfs -root-becomes allows the root to be reassigned
@@ -337,9 +339,6 @@ then
    unset makeinitrdopts 
    [ "$usesystemindex" ] && makeinitrdopts="--use-system-index"
    MakeInitRDTree $makeinitrdopts || Die "Failed creating initrd environment."
-   echo "Copying nls modules from Output/ROLayer/System/Kernel/Modules"
-   cp --remove-destination Output/ROLayer/Programs/Linux/Current/Resources/Unmanaged/System/Kernel/Modules/Current/kernel/fs/nls/nls_cp437.ko $initrd_dir/System/Kernel/Modules
-   cp --remove-destination Output/ROLayer/Programs/Linux/Current/Resources/Unmanaged/System/Kernel/Modules/Current/kernel/fs/nls/nls_iso8859-1.ko $initrd_dir/System/Kernel/Modules
 
    echo "Copying isolinux/kernel from Output/ROLayer/System/Kernel/Boot/kernel"
    cp --remove-destination Output/ROLayer/Programs/Linux/Current/Resources/Unmanaged/System/Kernel/Boot/kernel Output/ISO/isolinux/kernel
