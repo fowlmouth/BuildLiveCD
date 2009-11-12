@@ -28,6 +28,7 @@ then
    "squashfs") start_at=$STAGE_SQUASHFS;;
    "initrd")   start_at=$STAGE_INITRD;;
    "iso")      start_at=$STAGE_ISO;;
+   *)          Die "Invalid start stage \"$(Arg 1)\""
    esac
 else
    start_at=$STAGE_ROLAYER
@@ -40,6 +41,7 @@ then
    "squashfs") stop_at=$STAGE_SQUASHFS;;
    "initrd")   stop_at=$STAGE_INITRD;;
    "iso")      stop_at=$STAGE_ISO;;
+   *)          Die "Invalid stop stage \"$(Arg 1)\""
    esac
 else
    stop_at=$STAGE_ISO
