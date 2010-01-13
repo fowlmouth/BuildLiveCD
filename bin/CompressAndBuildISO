@@ -55,7 +55,9 @@ today=`date +%Y%m%d`
 localsvn=$root/LocalSVN
 packages=$root/Packages
 datadir="$livecdDataDir"
-usesystemindex="$livecdUseSystemIndex"
+
+unset usesystemindex
+[ "$livecdUseSystemIndex" = "true" ] && usesystemindex="true"
 
 if [ "$usesystemindex" ]
 then filesdir=Data
