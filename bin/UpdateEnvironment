@@ -10,10 +10,7 @@ then
    echo "It will fetch all needed files off the network"
    echo "and create the proper directory layout."
    echo "If you have SVN write access, pass your svn.gobolinux.org"
-   echo "username as a parameter." # and, optionally,"
-#   echo "the username in the current machine"
-#   echo "which holds your savannah SSH credentials,"
-#   echo "if it is not the same as your savannah username."
+   echo "username as a parameter." 
    echo
    exit 0
 fi
