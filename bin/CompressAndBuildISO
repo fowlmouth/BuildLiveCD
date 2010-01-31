@@ -89,7 +89,7 @@ then
    do
       tarball=$package--$today--$arch.tar.bz2
 
-      if [ ! -e "$tarball" -o "`find "$localsvn/tools/$package/" -newer "$tarball" 2> /dev/null`" ] 
+      if [ ! -e "$tarball" -o "`find "$localsvn/tools/$package/" -newer "$tarball" 2> /dev/null`" ]
       then
          echo "Packing $package SVN snapshot..."
          rm -rf $package                    # only required if there are leftovers from a previous execution
@@ -284,6 +284,7 @@ then
       # If we append to an existing squashfs -root-becomes allows the root to be reassigned
       # in this case, Programs
       empty_dir=`mktemp -d /tmp/BuildLiveCD-emptydir.XXXXX`
+      chmod a+rx "${empty_dir}"
       [ "$rtn" == "1" ] && mksquashfs $empty_dir $squashfile -root-becomes Programs
       rmdir $empty_dir
    done
