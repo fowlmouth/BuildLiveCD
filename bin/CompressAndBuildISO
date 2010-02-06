@@ -143,21 +143,6 @@ then
       fi
    done
 
-   # /Files/Fonts
-   ffontsmd5=`md5sum Archives/Files-Fonts.tar.bz2`
-   if [ -d "Output/ROLayer/$filesdir/Fonts" ]
-   then
-      ffontsmd5old=`cat Output/Checksums/Files-Fonts`
-   fi
-   if [ "$ffontsmd5" = "$ffontsmd5old" ]
-   then
-      echo "Keeping /$filesdir/Fonts..."
-   else
-      echo "Unpacking /$filesdir/Fonts..."
-      tar xfj Archives/Files-Fonts.tar.bz2 --overwrite -C Output/ROLayer/$filesdir
-      echo "$ffontsmd5" > Output/Checksums/Files-Fonts
-   fi
-
    # Clean SVN files from ROLayer
    echo "Removing SVN files..."
    find Output/ROLayer/$filesdir -type d -name .svn | xargs rm -rf
