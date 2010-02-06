@@ -27,6 +27,7 @@ then
 fi
 
 root=$PWD/Output/InitRD
+rolayer=$PWD/Output/ROLayer
 archives=$PWD/Archives/
 
 rm -rf $root
@@ -43,6 +44,10 @@ packages=(
    BusyBox-InitRD--20060202-SVN--$arch.tar.bz2
    MiniUdev--0.1--$arch.tar.bz2
    InitRDScripts--$today--$arch.tar.bz2
+)
+
+kernel_modules=(
+   loop
 )
 
 cd $root
@@ -106,6 +111,24 @@ done
 ####################################################
 
 Create_Device_Nodes $root
+
+####################################################
+# Install required kernel modules
+####################################################
+
+kernelversion=$(basename "$(readlink -f "$rolayer/Programs/Linux/Current")")
+mkdir -p "${root}/System/Kernel/Modules/${kernelversion}-Gobo/kernel"
+
+for module in "${kernel_modules[@]}"
+do
+   cd "$rolayer/Programs/Linux/Current/Resources/Unmanaged/System/Kernel/Modules/${kernelversion}-Gobo/kernel"
+   modpath="$(find -name ${module}.ko)"
+   popd &>/dev/null
+   mkdir -p "${root}/System/Kernel/Modules/${kernelversion}-Gobo/kernel/$(dirname ${modpath})"
+   cp --remove-destination $rolayer/Programs/Linux/Current/Resources/Unmanaged/System/Kernel/Modules/${kernelversion}-Gobo/kernel/${modpath} $root/System/Kernel/Modules/${kernelversion}-Gobo/kernel/${modpath}
+done
+
+depmod -b "${root}" ${kernelversion}-Gobo
 
 ####################################################
 # Populate /System/Settings
@@ -191,4 +214,8 @@ EOF
 cat <<EOF > $root/System/Settings/shells
 /bin/sh
 /bin/ash
+EOF
+
+cat <<EOF > $root/System/Settings/modprobe.conf
+options loop max_loop=64
 EOF
