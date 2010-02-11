@@ -75,7 +75,7 @@ cyrus-imapd:x:30:114::/var/empty:/bin/nologin
 postfix:x:32:32::/var/empty:/bin/nologin
 EOF
 
-write_file resolv_conf <<EOF
+write_file resolv.conf <<EOF
 # Domain name servers from OpenDNS.com
 nameserver 208.67.222.222
 nameserver 208.67.220.220
