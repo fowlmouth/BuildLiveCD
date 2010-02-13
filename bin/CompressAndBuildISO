@@ -129,6 +129,33 @@ then
       fi
    done
 
+   Log_Normal "Installing Aliens"
+   mkdir -p "${root}/Output/ROLayer/System/Aliens/"
+   exec 3<> "$datadir/Aliens-Packages-List"
+   while read line <&3
+   do
+      line="$(echo "${line}" | sed -r -e 's,\W*#.*,,' -e '/^\W*$/d')"
+      [ -z "${line}" ] && continue
+      alien="$(echo "${line}" | awk '{ print $1 }')"
+      version="$(echo "${line}" | awk '{ print $2 }')"
+
+      unset ualiens
+      for unmanaged_aliens in "${root}/Output/ROLayer/Programs/"*"/Current/Resources/Unmanaged/System/Aliens"
+      do
+         ualiens="${ualiens:+${ualiens}:}${unmanaged_aliens}=ro"
+      done
+      
+      mount -t unionfs -o dirs=${root}/Output/ROLayer/System/Aliens=rw:${ualiens} none "${root}/Output/ROLayer/System/Aliens"
+      if ! chroot "${root}/Output/ROLayer" Alien --met "${alien}" ${version} > /dev/null
+      then
+         echo "Installing ${alien}"
+         chroot "${root}/Output/ROLayer" Alien --install "${alien}" >/dev/null
+      else
+         echo "Keeping ${alien} $(chroot "${root}/Output/ROLayer" Alien --getversion "${alien}")"
+      fi
+      umount "${root}/Output/ROLayer/System/Aliens"
+   done
+
    echo "Coping $filesdir from LocalSVN..."
    # Add few items to rolayer
    for directory in Descriptions Wallpapers
@@ -224,7 +251,7 @@ then
       then
          echo "Creating squashfs compressed file $bn..."
          Quiet rm $out
-         nice -20 mksquashfs $dirs "$out" -noappend -no-sparse -keep-as-directory $blacklist
+         nice -20 mksquashfs $dirs "$out" -noappend -no-sparse -keep-as-directory ${blacklist:+-wildcards -e $blacklist}
          rtn=1  # Created squashfs file
       else
          echo "Mksquashfs not needed for $bn."
@@ -270,12 +297,20 @@ then
       # in this case, Programs
       empty_dir=`mktemp -d /tmp/BuildLiveCD-emptydir.XXXXX`
       chmod a+rx "${empty_dir}"
-      [ "$rtn" == "1" ] && mksquashfs $empty_dir $squashfile -root-becomes Programs
+      [ "$rtn" == "1" ] && Quiet mksquashfs $empty_dir $squashfile -root-becomes Programs
       rmdir $empty_dir
    done
 
-   contents=`ls | grep -v "$filesdir\|Programs\|Users" | tr -s '\n' ' '`
-   time mksquashfs_on_demand ../ISO/GoboLinux-rest.squashfs "$contents" "" ""
+   contents="$(ls --hide="$filesdir" --hide="Programs" --hide="Users" | tr -s '\n' ' ')"
+   time mksquashfs_on_demand ../ISO/GoboLinux-rest.squashfs "$contents" "" "System/Aliens*"
+   time mksquashfs_on_demand ../ISO/GoboLinux-aliens.squashfs "System/Aliens" "" ""
+   if [ $? == 1 ]
+   then
+      empty_dir=$(mktemp -d /tmp/BuildLiveCD-emptydir.XXXXX)
+      chmod a+rx "${empty_dir}"
+      Quiet mksquashfs $empty_dir ../ISO/GoboLinux-aliens.squashfs -root-becomes System
+      rmdir $empty_dir
+   fi
    Quiet popd # Output/Environment
 
    umount Output/Environment
