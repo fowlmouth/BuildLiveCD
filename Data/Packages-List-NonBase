@@ -32,7 +32,7 @@ Iwlwifi-4965-ucode
 Indent
 JACK
 JPEG
-LILO
+#LILO #removed 014.10
 Lame
 Lazy
 LibART_LGPL
@@ -65,7 +65,7 @@ Subversion
 SysFSUtils
 TIFF
 TagLib
-TraceRoute
+#TraceRoute #removed 014.10
 Unzip
 Vim
 Wireless-Tools
@@ -100,8 +100,8 @@ Links
 Mesa
 DriConf
 T1Lib
-WindowMaker
-Xpdf
+#WindowMaker
+#Xpdf
 
 # ################################################
 # GTK+ and family
@@ -109,7 +109,7 @@ Xpdf
 Cairo
 Pango
 GTK+
-Imlib
+Imlib2
 LibGlade
 LibRSVG
 
@@ -144,6 +144,6 @@ Pkgconfig
 
 PCMCIAUtils
 Madwifi
-WPA_Supplicant
+#WPA_Supplicant
 Dmraid
 NDISwrapper
