@@ -14,7 +14,7 @@ DHCPCD
 E2FSProgs
 Ed
 File
-Slocate    # Give Slocate precedence over FindUtils
+#Slocate #removed 014.10
 FindUtils
 Flex
 GCC
@@ -35,7 +35,7 @@ LibTool
 Linux
 Linux-Headers
 M4
-MC
+#MC #removed 014.10
 Make
 Man
 Man-Pages
@@ -46,19 +46,19 @@ Nano
 Nasm
 Ncurses
 Net-Tools
-Netkit-Base
+#Netkit-Base #removed 014.10
 OpenSSL
 Patch
 Perl
 Pinfo
 PCRE
-Procinfo
+#Procinfo #replaced 014.10
 Procps
 Psmisc
 PCIUtils
 Python
 Readline
-ReiserFSProgs
+#ReiserFSProgs #removed 014.10
 Sash
 Sed
 Shadow
@@ -69,9 +69,18 @@ Sysvinit
 Tar
 Texinfo
 Udev
-Util-Linux
+Util-Linux-NG
 Wget
 ZLib
 ZSH
 Dialog
-GoboHide
+#GoboHide #removed until the kernel patch is updated
+
+# 014.10 additions below VV
+MLocate
+Procinfo-NG
+Subversion
+GnuPG
+Gzip
+Shadow
+Linux-PAM

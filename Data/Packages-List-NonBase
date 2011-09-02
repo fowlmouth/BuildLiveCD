@@ -16,6 +16,7 @@ CVS
 Cdparanoia-III
 Cyrus-Sasl
 DB
+DB-Legacy
 DVD+RW-Tools
 Dcron
 Device-Mapper
@@ -121,8 +122,8 @@ Gimp
 MPlayer
 
 LibSigc++
-Cairomm
-Glibmm
+CairoMM
+GLibmm
 GTKMM
 GParted
 
@@ -133,7 +134,10 @@ NSPR
 NSS
 LibIDL
 Firefox
-Thunderbird
+SQLite # new with 014.10
+SQLite-Legacy # temp for compat 
+Tcl
+# Thunderbird
 
 Pkgconfig
 # LibStdC++
@@ -143,4 +147,3 @@ Madwifi
 WPA_Supplicant
 Dmraid
 NDISwrapper
-

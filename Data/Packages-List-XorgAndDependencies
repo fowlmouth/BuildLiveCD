@@ -1,5 +1,16 @@
 Expat
 Fontconfig
 FreeType 
-Xorg
-XTerm
+#Xorg #removed 014.10
+#XTerm #temp disable until fulfilled
+
+# 014.10 stuff below
+Xorg-App
+Xorg-Driver
+Xorg-Font
+Xorg-Lib
+Xorg-Proto
+Xorg-Server
+
+Openbox
+Pixman
